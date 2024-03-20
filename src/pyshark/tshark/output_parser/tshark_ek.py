@@ -1,13 +1,7 @@
-import json
+import orjson
 import os
 
 from pyshark.tshark.output_parser.base_parser import BaseTsharkOutputParser
-
-try:
-    import ujson
-    USE_UJSON = True
-except ImportError:
-    USE_UJSON = False
 
 from pyshark.packet.layers.ek_layer import EkLayer
 from pyshark.packet.packet import Packet
@@ -35,10 +29,7 @@ class TsharkEkJsonParser(BaseTsharkOutputParser):
         return data[start_index:linesep_location], data[linesep_location + 1:]
 
 def packet_from_ek_packet(json_pkt):
-    if USE_UJSON:
-        pkt_dict = ujson.loads(json_pkt)
-    else:
-        pkt_dict = json.loads(json_pkt.decode('utf-8'))
+    pkt_dict = orjson.loads(json_pkt)
 
     # We use the frame dict here and not the object access because it's faster.
     layers = pkt_dict['layers']
