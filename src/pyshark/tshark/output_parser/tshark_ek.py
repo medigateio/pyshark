@@ -34,7 +34,7 @@ class TsharkEkJsonParser(BaseTsharkOutputParser):
 
         return data[start_index:linesep_location], data[linesep_location + 1:]
 
-def packet_from_ek_packet_new(json_pkt):
+def packet_from_ek_packet(json_pkt):
     if USE_UJSON:
         pkt_dict = ujson.loads(json_pkt)
     else:
