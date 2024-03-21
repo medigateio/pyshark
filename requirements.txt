@@ -1,3 +1,6 @@
+# General requirements
+orjson
+
 # Development requirements. Only required for testing
 appdirs
 py
