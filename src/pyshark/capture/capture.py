@@ -366,6 +366,8 @@ class Capture:
     async def _cleanup_subprocess(self, process):
         """Kill the given process and properly closes any pipes connected to it."""
         self._log.debug(f"Cleanup Subprocess (pid {process.pid})")
+        if process in self._running_processes:
+            self._running_processes.remove(process)
         if process.returncode is None:
             try:
                 process.kill()
