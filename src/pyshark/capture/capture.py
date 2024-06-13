@@ -235,6 +235,7 @@ class Capture:
                     break
         finally:
             if tshark_process in self._running_processes:
+                self._running_processes.remove(tshark_process)
                 self.eventloop.run_until_complete(
                     self._cleanup_subprocess(tshark_process))
 
@@ -366,8 +367,6 @@ class Capture:
     async def _cleanup_subprocess(self, process):
         """Kill the given process and properly closes any pipes connected to it."""
         self._log.debug(f"Cleanup Subprocess (pid {process.pid})")
-        if process in self._running_processes:
-            self._running_processes.remove(process)
         if process.returncode is None:
             try:
                 process.kill()
