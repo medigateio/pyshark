@@ -397,9 +397,10 @@ class Capture:
         self.eventloop.run_until_complete(self.close_async())
 
     async def close_async(self):
-        for process in self._running_processes.copy():
-            await self._cleanup_subprocess(process)
+        running_processes = self._running_processes.copy()
         self._running_processes.clear()
+        for process in running_processes:
+            await self._cleanup_subprocess(process)
 
         # Wait for all stderr handling to finish
         await asyncio.gather(*self._stderr_handling_tasks)
