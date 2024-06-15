@@ -234,9 +234,8 @@ class Capture:
                 if packet_count and packets_captured >= packet_count:
                     break
         finally:
-            if tshark_process in self._running_processes:
-                self.eventloop.run_until_complete(
-                    self._cleanup_subprocess(tshark_process))
+            self.eventloop.run_until_complete(
+                self._cleanup_subprocess(tshark_process))
 
     def apply_on_packets(self, callback, timeout=None, packet_count=None):
         """Runs through all packets and calls the given callback (a function) with each one as it is read.
@@ -366,6 +365,11 @@ class Capture:
     async def _cleanup_subprocess(self, process):
         """Kill the given process and properly closes any pipes connected to it."""
         self._log.debug(f"Cleanup Subprocess (pid {process.pid})")
+        
+        if process not in self._running_processes:
+            return 
+        self._running_processes.remove(process)
+        
         if process.returncode is None:
             try:
                 process.kill()
@@ -399,7 +403,6 @@ class Capture:
     async def close_async(self):
         for process in self._running_processes.copy():
             await self._cleanup_subprocess(process)
-        self._running_processes.clear()
 
         # Wait for all stderr handling to finish
         await asyncio.gather(*self._stderr_handling_tasks)
