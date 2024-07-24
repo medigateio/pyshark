@@ -49,19 +49,6 @@ class FileCapture(Capture):
             raise FileNotFoundError(f"{self.input_filepath} is a directory")
 
         self.keep_packets = keep_packets
-        self._packet_generator = self._packets_from_tshark_sync()
-
-    def next(self) -> Packet:
-        """Returns the next packet in the cap.
-
-        If the capture's keep_packets flag is True, will also keep it in the internal packet list.
-        """
-        if not self.keep_packets:
-            return self._packet_generator.send(None)
-        elif self._current_packet >= len(self._packets):
-            packet = self._packet_generator.send(None)
-            self._packets += [packet]
-        return super(FileCapture, self).next_packet()
 
     def __getitem__(self, packet_index):
         if not self.keep_packets:
