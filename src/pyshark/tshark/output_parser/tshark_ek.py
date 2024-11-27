@@ -29,7 +29,6 @@ class TsharkEkJsonParser(BaseTsharkOutputParser):
         return data[start_index:linesep_location], data[linesep_location + 1:]
 
 def packet_from_ek_packet(json_pkt):
-    # TODO: populate the allow_invalid_characters parameter to all the call sites
     try:
         pkt_dict = orjson.loads(json_pkt)
     except orjson.JSONDecodeError:
