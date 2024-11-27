@@ -29,7 +29,12 @@ class TsharkEkJsonParser(BaseTsharkOutputParser):
         return data[start_index:linesep_location], data[linesep_location + 1:]
 
 def packet_from_ek_packet(json_pkt):
-    pkt_dict = orjson.loads(json_pkt)
+    try:
+        pkt_dict = orjson.loads(json_pkt)
+    except orjson.JSONDecodeError:
+        # This usually results from incorrect dissection of the packet by tshark, which might
+        # cause invalid characters to be inserted into the JSON.
+        pkt_dict = orjson.loads(json_pkt.decode('utf-8', errors="replace"))
 
     # We use the frame dict here and not the object access because it's faster.
     layers = pkt_dict['layers']
