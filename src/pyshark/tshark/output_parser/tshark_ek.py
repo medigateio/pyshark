@@ -28,16 +28,14 @@ class TsharkEkJsonParser(BaseTsharkOutputParser):
 
         return data[start_index:linesep_location], data[linesep_location + 1:]
 
-def packet_from_ek_packet(json_pkt, allow_invalid_characters=True):
+def packet_from_ek_packet(json_pkt):
     # TODO: populate the allow_invalid_characters parameter to all the call sites
     try:
         pkt_dict = orjson.loads(json_pkt)
     except orjson.JSONDecodeError:
-        if allow_invalid_characters:
-            # This usually results from incorrect dissecting of the packet by tshark.
-            pkt_dict = orjson.loads(json_pkt.decode('utf-8', errors="replace"))
-        else:
-            raise
+        # This usually results from incorrect dissection of the packet by tshark, which might
+        # cause invalid characters to be inserted into the JSON.
+        pkt_dict = orjson.loads(json_pkt.decode('utf-8', errors="replace"))
 
     # We use the frame dict here and not the object access because it's faster.
     layers = pkt_dict['layers']
