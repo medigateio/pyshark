@@ -461,6 +461,8 @@ class Capture:
         if self._disable_protocol:
             params += ["--disable-protocol", self._disable_protocol.strip()]
 
+        params += ["-M", "200000"]
+
         return params
 
     def __iter__(self):
