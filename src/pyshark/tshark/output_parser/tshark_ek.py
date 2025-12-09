@@ -1,4 +1,5 @@
 import orjson
+import json
 import os
 
 from pyshark.tshark.output_parser.base_parser import BaseTsharkOutputParser
@@ -33,8 +34,9 @@ def packet_from_ek_packet(json_pkt):
         pkt_dict = orjson.loads(json_pkt)
     except orjson.JSONDecodeError:
         # This usually results from incorrect dissection of the packet by tshark, which might
-        # cause invalid characters to be inserted into the JSON.
-        pkt_dict = orjson.loads(json_pkt.decode('utf-8', errors="replace"))
+        # cause invalid characters or control charactersto be inserted into the JSON. 
+        # Fallback to the slower json.loads with strict=False to handle the invalid characters.
+        pkt_dict = json.loads(json_pkt.decode('utf-8', errors='replace'), strict=False)
 
     # We use the frame dict here and not the object access because it's faster.
     layers = pkt_dict['layers']
